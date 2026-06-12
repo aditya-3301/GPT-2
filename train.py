@@ -1,3 +1,4 @@
+import torch
 import re
 from collections import defaultdict
 
@@ -18,9 +19,10 @@ def word_tokenize(text):
     # Split on spaces but keep punctuation as separate tokens
     tokens = re.findall(r"\w+|[^\w\s]", text)
     return tokens
-
 word_tokens = word_tokenize(text)
-print(f"\nFirst 50 word tokens:\n {word_tokens[:50]}")
+
+
+print(f"\nFirst 50 WORD tokens:\n {word_tokens[:50]}")
 
 def get_vocab(text):
     """Convert words into character seq. with END marker for Bytepairencoding"""
@@ -65,7 +67,7 @@ def train_bpe(text, n_merges):
 
     return vocab, merges
 
-print("\nBPE\n")
+print("\n\n")
 bpe_vocab, merges = train_bpe(text, n_merges=100)
 
 # Build final token list from BPE vocab
@@ -76,7 +78,42 @@ for word in bpe_vocab:
 
 bpe_tokens = sorted(list(bpe_tokens))
 print(f"BPE vocab size: {len(bpe_tokens)}")
-print(f"tokens: {bpe_tokens}")
+print(f"First 20 tokens: {bpe_tokens[:20]}")
 
 stoi = {token: i for i, token in enumerate(bpe_tokens)}
 itos = {i: token for i, token in enumerate(bpe_tokens)}
+
+#string ot integer and integer to string
+
+def encode(text):
+    words = text.strip().split()
+    token_ids = []
+    for word in words:
+        # split word into characters with end marker
+        symbols = list(word) + ['<end>']
+        # apply each merge in order
+        for pair in merges:
+            i = 0
+            while i < len(symbols) - 1:
+                if symbols[i] == pair[0] and symbols[i+1] == pair[1]:
+                    symbols = symbols[:i] + [''.join(pair)] + symbols[i+2:]
+                else:
+                    i += 1
+        # look up each resulting token in stoi
+        for token in symbols:
+            if token in stoi:
+                token_ids.append(stoi[token])
+    return token_ids
+
+encoded = encode(text)
+
+n = int(0.9 * len(encoded))
+train = encoded[:n]
+test = encoded[n:]
+
+
+train = torch.tensor(train, dtype=torch.long)
+test = torch.tensor(test, dtype=torch.long)
+
+print(f"Train tokens: {len(train)}, Test tokens: {len(test)}")
+print(f"Device: {torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU'}")

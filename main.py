@@ -26,11 +26,16 @@ from train import (
     # model classes
     Head,
     MultiHeadAttention,
+    FeedForward,
+    Block,
     BigramLM,
     # hyperparameters
     block_size,
     batch_size,
     n_embed,
+    dropout,
+    # eval helper
+    estimate_loss,
 )
 
 import torch

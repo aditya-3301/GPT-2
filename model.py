@@ -158,6 +158,8 @@ class BigramLM(nn.Module):
         self.blocks = nn.Sequential(
             Block(n_embed, n_head=4),
             Block(n_embed, n_head=4),
+            Block(n_embed, n_head=4),
+            Block(n_embed, n_head=4)
         )
         self.ln_f    = nn.LayerNorm(n_embed)
         self.lm_head = nn.Linear(n_embed, vocab_size)

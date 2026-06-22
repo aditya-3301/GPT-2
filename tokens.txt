@@ -6,7 +6,6 @@
 '
 (
 )
-*
 ,
 ,<end>
 ,<para>
@@ -117,7 +116,6 @@ You<end>
 Z
 [
 ]
-_
 a
 a<end>
 a<para>
